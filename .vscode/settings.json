@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": "fastcampus_django_venv/bin/python3.7",
+    "python.formatting.provider": "autopep8"
+}
