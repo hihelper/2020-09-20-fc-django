@@ -6,7 +6,19 @@ from django.contrib.auth.hashers import make_password, check_password
 # Create your views here.
 
 
+def home(request):
+    # home 함수는 session에 id 값이 저장되어 있는 경우에는 로그인된 화면을 보여준다.
+    user_id = request.session.get('user')
+    if user_id:
+        fcuser = Fcuser.objects.get(pk=user_id)
+        return HttpResponse(fcuser.username)
+
+    return HttpResponse('home!!')
+
+
 def login(request):
+    # login 함수는 GET, POST 방식으로 구분하여 처리한다.
+    # 특히 POST 방식의 경우에는 session 을 이용해 로그인을 처리한다.
     if request.method == 'GET':
         return render(request, 'login.html', res_data)
     if request.method == 'POST':
@@ -20,12 +32,21 @@ def login(request):
             fcuser = Fcuser.objects.get(username=username)
             if check_password(password, fcuser.password):
                 # login process done
+                request.session['user'] = fcuser.id
+                return redirect('/')
                 # session !!
                 # go to the home !! (redirect)
                 pass
             else:
                 res_data['error'] = '비밀번호가 틀렸습니다.'
         return render(request, 'login.html', res_data)
+
+
+def logout(request):
+    # logout 을 구현하는 방법은 간단!! session 내부에 존재하는 값을 삭제만 해주면 된다.
+    if request.session.get('user'):
+        del(request.session['user'])
+    return redirect('/')
 
 
 def register(request):
