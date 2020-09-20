@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import Fcuser
 from django.contrib.auth.hashers import make_password, check_password
+from .forms import LoginForm
+
 # Create your views here.
 
 
@@ -17,29 +19,8 @@ def home(request):
 
 
 def login(request):
-    # login 함수는 GET, POST 방식으로 구분하여 처리한다.
-    # 특히 POST 방식의 경우에는 session 을 이용해 로그인을 처리한다.
-    if request.method == 'GET':
-        return render(request, 'login.html', res_data)
-    if request.method == 'POST':
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-
-        res_data = {}
-        if not (username and password):
-            res_data['error'] = '모든 값을 입력해주세요'
-        else:
-            fcuser = Fcuser.objects.get(username=username)
-            if check_password(password, fcuser.password):
-                # login process done
-                request.session['user'] = fcuser.id
-                return redirect('/')
-                # session !!
-                # go to the home !! (redirect)
-                pass
-            else:
-                res_data['error'] = '비밀번호가 틀렸습니다.'
-        return render(request, 'login.html', res_data)
+    form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
 
 def logout(request):
